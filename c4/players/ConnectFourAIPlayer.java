@@ -78,15 +78,14 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
             }
         }
         int[] validMovesInt = new int[size];
-        List<Integer> valid = new ArrayList<>();
+        int arrIndex = 0;
         for(int i = 0; i<validMovesBool.length; i++){
             if(validMovesBool[i]){
-                valid.add(i);
+                validMovesInt[arrIndex] = i;
+                arrIndex++;
             }
         }
         
-        //ill fix this when i finish studying
-        validMovesInt = valid.toArray();
-        return valid.toArray();
+        return validMovesInt;
     }
 }
