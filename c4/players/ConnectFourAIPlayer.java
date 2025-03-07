@@ -29,30 +29,7 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
 
     //question 3- actions
     public int[] actions(int[][] state){
-        boolean[] validMovesBool = new boolean[7];
-        int[] currCol = new int[state[0].length];
-        int usedSpacesInCol = 0;
-        //first set all booleans to true
-        for(int i = 0; i<7; i++){
-            validMovesBool[i] = true;
-        }
-        //loop through the current state of the board and check if the row is full
-        for(int col = 0; col<state.length; col++){
-            for(int row=0; row< state[0].length; row++){
-                currCol[row] = state[col][row];
-                //if the whole row is full mark that spot in the bool array as false
-			}
-            for(int i = 0; i< currCol.length; i++){
-                //if the spot is not empty increase the numbe of spots filled in that column
-                if(currCol[i] != -1){
-                    usedSpacesInCol++;
-                }
-            }
-            //if the number of used spaces the columns length then the column is full
-            if(usedSpacesInCol == currCol.length){
-                validMovesBool[col] = false;
-            }
-        }
+        boolean[] validMovesBool = model.getValidMoves();
         //go through valid moves boolean and covert to which int columns are free
         int size = 0;
         for(int i = 0; i<validMovesBool.length; i++){
@@ -108,19 +85,54 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
     //returns an action (int)
     public int alphaBetaSearch(int[][] state){
 		int v = maxValue(state, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-		return -1;
+		return v;
 	}
 	
 	public int maxValue(int[][] state, double alpha, double beta){
-		if(terminalTest(state)){
+		//if current state is terminal state (end of game) then return the utility
+        if(terminalTest(state)){
             return utility(state);
         }
         double v = Double.NEGATIVE_INFINITY;
-		return -1;
+        //for each column in state
+        for(int col = 0; col < state.length; col++){
+            for(int row = 0; row < state[0].length; row++){
+                //for each a in action state: for each column 0-6
+                //v = the higher value between v and min value (max v and min)
+                v = Math.max(v, minValue(result(state, col), alpha, beta));
+                //if v's greater than or equal to beta return v
+                if(v >= beta){
+                    return (int)v;
+                }
+                //alpha = higher value between alpha and v (max alpha and v)
+                alpha = Math.max(alpha, v);
+            }
+        }
+        //return v
+		return (int)v;
 	}
 	
 	public int minValue(int[][] state, double alpha, double beta){
-		/* REPLACE WITH YOUR CODE */
-		return -1;
+		//if current state is terminal state (end of game) then return the utility
+        if(terminalTest(state)){
+            return utility(state);
+        }
+        double v = Double.POSITIVE_INFINITY;
+        //for each column in state
+        for(int col = 0; col < state.length; col++){
+            for(int row = 0; row < state[0].length; row++){
+                //for each a in action state: for each column 0-6
+                //v = the lower value between v and max value (min v and min)
+                v = Math.min(v, maxValue(result(state, col), alpha, beta));
+                //if v's less than or equal to beta return v
+                if(v <= alpha){
+                    return (int)v;
+                }
+                //beta = lower value between beta and v (min beta and v)
+                beta = Math.min(beta, v);
+            }
+        }
+        //return v
+		return (int)v;
 	}
 }
