@@ -1,8 +1,5 @@
 package c4.players;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import c4.mvc.ConnectFourModelInterface;
@@ -69,7 +66,6 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
                 validMovesBool[col] = false;
             }
         }
-
         //go through valid moves boolean and covert to which int columns are free
         int size = 0;
         for(int i = 0; i<validMovesBool.length; i++){
@@ -85,7 +81,13 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
                 arrIndex++;
             }
         }
-        
         return validMovesInt;
+    }
+
+    //question 4: results
+    public int[][] result(int[][] state, int action){
+        model.setGrid(state);
+        model.setGridPosition(action, model.getTurn());
+        return model.getGrid();
     }
 }
