@@ -13,19 +13,6 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
 		this.model = model;
 		this.random = new Random();
 	}
-	
-	@Override
-	public int getMove() {
-		boolean[] moves = model.getValidMoves();
-        //find the first valid move and return it
-        int num = 0;
-        for(int i = 0; i < moves.length; i++){
-            if (moves[i] == true){
-                num = i;
-            }
-        }
-        return num;
-	}
 
     //question 2- terminal test
     public boolean terminalTest(int[][] state){
@@ -90,4 +77,50 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
         model.setGridPosition(action, model.getTurn());
         return model.getGrid();
     }
+
+    //question 5: alpha beta pruning 
+    @Override
+	public int getMove() {
+		boolean[] moves = model.getValidMoves();
+        //find the first valid move and return it
+        int num = 0;
+        for(int i = 0; i < moves.length; i++){
+            if (moves[i] == true){
+                num = i;
+            }
+        }
+        return num;
+	}
+
+    public int utility(int[][] state){
+        model.setGrid(state);
+        if(model.checkForWinner() >= 0){
+            return 1000;
+        }
+        else if(model.checkForDraw()){
+            return 0;
+        }
+        else{
+            return -1000;
+        }
+    }
+
+    //returns an action (int)
+    public int alphaBetaSearch(int[][] state){
+		int v = maxValue(state, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+		return -1;
+	}
+	
+	public int maxValue(int[][] state, double alpha, double beta){
+		if(terminalTest(state)){
+            return utility(state);
+        }
+        double v = Double.NEGATIVE_INFINITY;
+		return -1;
+	}
+	
+	public int minValue(int[][] state, double alpha, double beta){
+		/* REPLACE WITH YOUR CODE */
+		return -1;
+	}
 }
