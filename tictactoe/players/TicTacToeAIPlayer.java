@@ -113,22 +113,72 @@ public class TicTacToeAIPlayer extends TicTacToePlayer {
 	}
 	
 	public int getMove(){
-		/* REPLACE WITH YOUR CODE */
-		return -1;
+		return alphaBetaSearch(model.getGrid());
 	}
 	
 	public int alphaBetaSearch(char[][] state){
 		/* REPLACE WITH YOUR CODE */
-		return -1;
+		//return -1;
+		int bestAction = -1;
+    	double bestValue = Double.NEGATIVE_INFINITY;
+    	int[] availableActions = actions(state);
+
+    	for (int action : availableActions) {
+        	char[][] newState = result(state, action);
+        	int v = minValue(newState, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY); // Start with minValue for opponent's turn
+        	if (v > bestValue) {
+            	bestValue = v;
+            	bestAction = action;
+        	}
+    	}
+    	return bestAction;
 	}
 	
-	public int maxValue(char[][] state, int alpha, int beta){
+	public int maxValue(char[][] state, double alpha, double beta){
 		/* REPLACE WITH YOUR CODE */
-		return -1;
+		//return -1;
+		//if current state is terminal state (end of game) then return the utility
+        if(terminalTest(state)){
+            return utility(state);
+        }
+        double v = Double.NEGATIVE_INFINITY;
+        //for action in actions
+        for(int action: actions(state)){
+            //for each a in action state: for each column 0-6
+            //v = the higher value between v and min value (max v and min)
+            v = Math.max(v, minValue(result(state, action), alpha, beta));
+            //if v's greater than or equal to beta return v
+            if(v >= beta){
+                return (int)v;
+            }
+            //alpha = higher value between alpha and v (max alpha and v)
+            alpha = Math.max(alpha, v);
+        }
+        //return v
+		return (int)v;
 	}
 	
-	public int minValue(char[][] state, int alpha, int beta){
+	public int minValue(char[][] state, double alpha, double beta){
 		/* REPLACE WITH YOUR CODE */
-		return -1;
+		//return -1;
+		//if current state is terminal state (end of game) then return the utility
+        if(terminalTest(state)){
+            return utility(state);
+        }
+        double v = Double.POSITIVE_INFINITY;
+        //for each column in state
+        for(int action: actions(state)){
+            //for each a in action state: for each column 0-6
+            //v = the lower value between v and max value (min v and min)
+            v = Math.min(v, maxValue(result(state, action), alpha, beta));
+            //if v's less than or equal to beta return v
+            if(v <= alpha){
+                return (int)v;
+            }
+            //beta = lower value between beta and v (min beta and v)
+            beta = Math.min(beta, v);
+        }
+        //return v
+		return (int)v;
 	}
 }

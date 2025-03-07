@@ -58,15 +58,7 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
     //question 5: alpha beta pruning 
     @Override
 	public int getMove() {
-		boolean[] moves = model.getValidMoves();
-        //find the first valid move and return it
-        int num = 0;
-        for(int i = 0; i < moves.length; i++){
-            if (moves[i] == true){
-                num = i;
-            }
-        }
-        return num;
+		return alphaBetaSearch(model.getGrid());
 	}
 
     public int utility(int[][] state){
@@ -84,8 +76,19 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
 
     //returns an action (int)
     public int alphaBetaSearch(int[][] state){
-		int v = maxValue(state, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-		return v;
+        int bestAction = -1;
+    	double bestValue = Double.NEGATIVE_INFINITY;
+    	int[] availableActions = actions(state);
+
+    	for (int action : availableActions) {
+        	int[][] newState = result(state, action);
+        	int v = minValue(newState, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY); // Start with minValue for opponent's turn
+        	if (v > bestValue) {
+            	bestValue = v;
+            	bestAction = action;
+        	}
+    	}
+    	return bestAction;
 	}
 	
 	public int maxValue(int[][] state, double alpha, double beta){
@@ -94,19 +97,17 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
             return utility(state);
         }
         double v = Double.NEGATIVE_INFINITY;
-        //for each column in state
-        for(int col = 0; col < state.length; col++){
-            for(int row = 0; row < state[0].length; row++){
-                //for each a in action state: for each column 0-6
-                //v = the higher value between v and min value (max v and min)
-                v = Math.max(v, minValue(result(state, col), alpha, beta));
-                //if v's greater than or equal to beta return v
-                if(v >= beta){
-                    return (int)v;
-                }
-                //alpha = higher value between alpha and v (max alpha and v)
-                alpha = Math.max(alpha, v);
+        //for action in actions
+        for(int action: actions(state)){
+            //for each a in action state: for each column 0-6
+            //v = the higher value between v and min value (max v and min)
+            v = Math.max(v, minValue(result(state, action), alpha, beta));
+            //if v's greater than or equal to beta return v
+            if(v >= beta){
+                return (int)v;
             }
+            //alpha = higher value between alpha and v (max alpha and v)
+            alpha = Math.max(alpha, v);
         }
         //return v
 		return (int)v;
@@ -119,18 +120,16 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
         }
         double v = Double.POSITIVE_INFINITY;
         //for each column in state
-        for(int col = 0; col < state.length; col++){
-            for(int row = 0; row < state[0].length; row++){
-                //for each a in action state: for each column 0-6
-                //v = the lower value between v and max value (min v and min)
-                v = Math.min(v, maxValue(result(state, col), alpha, beta));
-                //if v's less than or equal to beta return v
-                if(v <= alpha){
-                    return (int)v;
-                }
-                //beta = lower value between beta and v (min beta and v)
-                beta = Math.min(beta, v);
+        for(int action: actions(state)){
+            //for each a in action state: for each column 0-6
+            //v = the lower value between v and max value (min v and min)
+            v = Math.min(v, maxValue(result(state, action), alpha, beta));
+            //if v's less than or equal to beta return v
+            if(v <= alpha){
+                return (int)v;
             }
+            //beta = lower value between beta and v (min beta and v)
+            beta = Math.min(beta, v);
         }
         //return v
 		return (int)v;
