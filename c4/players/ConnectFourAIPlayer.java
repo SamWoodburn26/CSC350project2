@@ -2,6 +2,7 @@ package c4.players;
 
 import java.util.Random;
 
+import c4.mvc.ConnectFourModel;
 import c4.mvc.ConnectFourModelInterface;
 
 public class ConnectFourAIPlayer extends ConnectFourPlayer{
@@ -16,9 +17,10 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
 
     //question 2- terminal test
     public boolean terminalTest(int[][] state){
-        model.setGrid(state);
+        ConnectFourModel tempModel = new ConnectFourModel();
+        tempModel.setGrid(state);
         //check for winner or draw
-        if(model.checkForWinner() >= 0 || model.checkForDraw()){
+        if(tempModel.checkForWinner() >= 0 || tempModel.checkForDraw()){
             return true;
         }
         //otherwise return false
@@ -58,15 +60,17 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
     //question 5: alpha beta pruning 
     @Override
 	public int getMove() {
+        //System.out.println("get move");
 		return alphaBetaSearch(model.getGrid());
 	}
 
     public int utility(int[][] state){
-        model.setGrid(state);
-        if(model.checkForWinner() >= 0){
+        ConnectFourModel tempModel = new ConnectFourModel();
+        tempModel.setGrid(state);
+        if(tempModel.checkForWinner() >= 0){
             return 1000;
         }
-        else if(model.checkForDraw()){
+        else if(tempModel.checkForDraw()){
             return 0;
         }
         else{
@@ -74,12 +78,15 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
         }
     }
 
+    //use model
     //returns an action (int)
     public int alphaBetaSearch(int[][] state){
+        model.setGrid(state);
         int bestAction = -1;
     	double bestValue = Double.NEGATIVE_INFINITY;
     	int[] availableActions = actions(state);
 
+        //System.out.println("search called");
     	for (int action : availableActions) {
         	int[][] newState = result(state, action);
         	int v = minValue(newState, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY); // Start with minValue for opponent's turn
@@ -92,7 +99,8 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
 	}
 	
 	public int maxValue(int[][] state, double alpha, double beta){
-		//if current state is terminal state (end of game) then return the utility
+		//System.out.println("max called");
+        //if current state is terminal state (end of game) then return the utility
         if(terminalTest(state)){
             return utility(state);
         }
@@ -114,6 +122,7 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer{
 	}
 	
 	public int minValue(int[][] state, double alpha, double beta){
+        //System.out.println("min called");
 		//if current state is terminal state (end of game) then return the utility
         if(terminalTest(state)){
             return utility(state);

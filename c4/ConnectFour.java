@@ -7,8 +7,8 @@ public class ConnectFour {
 
 	public static void main(String[] args) {
 		// Choose one
-		//playSingleGame();
-		playBatchGames(500);
+		playSingleGame();
+		//playBatchGames(500);
 				
 	}
 	
@@ -17,7 +17,9 @@ public class ConnectFour {
 		
 		// Change the constructor calls to change the players used
 		ConnectFourPlayer player1 = new ConnectFourAIPlayer(m);
-		ConnectFourPlayer player2 = new ConnectFourRandomPlayer(m);
+		//ConnectFourPlayer player1 = new ConnectFourRandomPlayer(m);
+
+		ConnectFourPlayer player2 = new ConnectFourHumanPlayer(m);
 		
 		// Choose 1 of the Controller/View set-ups below.
 		
@@ -25,10 +27,10 @@ public class ConnectFour {
 		//ConnectFourController c = new ConnectFourController(m, player1, player2, false);
 
 		// Sets up console view -- All output to console
-		ConnectFourController c = new ConnectFourController(m, player1, player2, true);
+		// ConnectFourController c = new ConnectFourController(m, player1, player2, true);
 		
 		// Sets up GUI view -- All output thru Swing GUI
-		//ConnectFourController c = new ConnectFourController(m, player1, player2);
+			 ConnectFourController c = new ConnectFourController(m, player1, player2);
 		
 		// Start the game
 		c.start();
