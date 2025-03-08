@@ -24,10 +24,10 @@ public class ConnectFourModel implements ConnectFourModelInterface{
 		notifyGridObservers();
 	}
 
-	@Override
-	public void setGrid(int[][] grid){
-		this.grid = grid;
-	}
+	// @Override
+	// public void setGrid(int[][] grid){
+	// 	this.grid = grid;
+	// }
 	
 	@Override
 	public int setGridPosition(int column, int player) {

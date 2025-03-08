@@ -8,7 +8,7 @@ public interface ConnectFourModelInterface {
 	void initialize();
 	int setGridPosition(int column, int player);
 	void nextPlayer();
-	void setGrid(int[][] grid);
+	// void setGrid(int[][] grid);
 
 	int checkForWinner();
 	boolean checkForDraw();
