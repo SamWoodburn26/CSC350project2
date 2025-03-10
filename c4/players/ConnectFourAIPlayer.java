@@ -130,82 +130,107 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
 
 
 
-    //QUESTION 5: ALPHA BETA PRUNING
-    /* get move- override connect four players get move to run the alpha beta search for the ai players move */
-    @Override
-    public int getMove() {
-        return alphaBetaSearch(model.getGrid());
-    }
-
-    /* utility-  */
+    //QUESTION 7: UTILITY EXPLANATION
+        /*
+         * for this utility function we decide to use two factors to determine the best possible action.
+         * the first is CONTINUE TOMORROW
+         */
+    /* utility- determine the 'goodness' of each possible action for given state, returns int action */
+        /* for this we decided to have the center columns be better than the outer columns (because there are more options) */
     public int utility(int[][] state) {
+        //make a temporary model to hold a copy of the given state
         ConnectFourModel tempModel = new ConnectFourModel();
         tempModel.initialize();
         tempModel.grid = deepCopy(state);
+        //check for winner and get current turn
         int winner = tempModel.checkForWinner();
         int aiPlayer = model.getTurn();
     
-        // Terminal states
+        //terminal states (winner and draw)
         if (winner >= 0) {
             return (winner == aiPlayer) ? 1000 : -1000;
         } else if (tempModel.checkForDraw()) {
             return 0;
         }
     
-        // Non-terminal evaluation
-        int score = 0;
+        //non-terminal evaluation (calculate goodness score)
+        int goodness = 0;
         int opponent = (aiPlayer == 1) ? 2 : 1;
-    
-        // Center control (columns 2, 3, 4 are more valuable)
-        int[] centerWeights = {0, 0, 1, 2, 1, 0, 0}; // Higher weight for central columns
+        //more important centers (assign a weight to each column: columns 2, 3, 4 are more valuable)
+        int[] centerWeights = {0, 0, 1, 2, 1, 0, 0}; 
+        //loop through the board
         for (int col = 0; col < 7; col++) {
             for (int row = 0; row < 6; row++) {
-                if (state[col][row] == aiPlayer) { // Fix: col first, then row
-                    score += centerWeights[col];
-                } else if (state[col][row] == opponent) { // Fix: col first, then row
-                    score -= centerWeights[col];
+                //if current spot is the ai player add then the weight value of that column to goodness score
+                if (state[col][row] == aiPlayer) { 
+                    goodness += centerWeights[col];
+                } 
+                //if current spot is the opponent then subtract the weight value of that column from goodness score
+                else if (state[col][row] == opponent) { 
+                    goodness -= centerWeights[col];
                 }
             }
         }
-    
-        // Potential three-in-a-rows (simplified heuristic)
-        score += countPotentialThrees(state, aiPlayer) * 50;
-        score -= countPotentialThrees(state, opponent) * 50;
-    
-        return score;
+        //calculate the potential three-in-a-rows (heuristic), add to goodness score if ai player, subtract from goodness score if opponent
+        goodness += countPotentialThrees(state, aiPlayer) * 50;
+        goodness -= countPotentialThrees(state, opponent) * 50;
+        //return the goodness score
+        return goodness;
     }
     
+    /* helper method for utility: calculate the number of potential three in a rows */
     private int countPotentialThrees(int[][] state, int player) {
         int count = 0;
-        // Horizontal
+        /* horizontal  potential three in a rows*/
+        //loop through each row and sets of 3 columns
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 4; col++) {
+                //keep track of the current players position and number of empty positions
                 int playerCount = 0;
                 int emptyCount = 0;
                 for (int i = 0; i < 4; i++) {
-                    if (state[col + i][row] == player) playerCount++; // Fix: col first, then row
-                    else if (state[col + i][row] == -1) emptyCount++; // Fix: col first, then row
+                    if (state[col + i][row] == player){
+                        playerCount++;
+                    } else if(state[col + i][row] == -1) {
+                        emptyCount++;
+                    }
                 }
+                //if player has 3 and 1 empty then increase count
                 if (playerCount == 3 && emptyCount == 1) count++;
             }
         }
-        // Vertical
+        /* vertical potential three in a rows */
+         //loop through each column and sets of 3 rows
         for (int col = 0; col < 7; col++) {
             for (int row = 0; row < 3; row++) {
+                //keep track of the current players position and number of empty positions
                 int playerCount = 0;
                 int emptyCount = 0;
                 for (int i = 0; i < 4; i++) {
-                    if (state[col][row + i] == player) playerCount++; // Fix: col first, then row
-                    else if (state[col][row + i] == -1) emptyCount++; // Fix: col first, then row
+                    if (state[col][row + i] == player) {
+                        playerCount++; 
+                    }
+                    else if (state[col][row + i] == -1) {
+                        emptyCount++; 
+                    }
                 }
+                //if player has 3 and 1 empty then increase count
                 if (playerCount == 3 && emptyCount == 1) count++;
             }
         }
         // Add diagonal checks if time permits (similar logic)
+        //return count
         return count;
     }
 
 
+
+    //QUESTION 5: ALPHA BETA PRUNING
+    /* get move- override connect four players get move to run the alpha beta search for the ai players move */
+    @Override
+    public int getMove() {
+        return alphaBetaSearch(model.getGrid());
+    }
 
 
     /* alpha beta search- takes an int[][] state parameter and returns an int- the best action for the given state */

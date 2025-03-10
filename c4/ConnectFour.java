@@ -16,7 +16,7 @@ public class ConnectFour {
 		ConnectFourModel m = new ConnectFourModel();
 		
 		// Change the constructor calls to change the players used
-		ConnectFourPlayer player1 = new ConnectFourAIPlayer(m, 6);
+		ConnectFourPlayer player1 = new ConnectFourAIPlayer(m, 6);	//ai player with cutoff 6
 		//ConnectFourPlayer player1 = new ConnectFourRandomPlayer(m);
 
 		ConnectFourPlayer player2 = new ConnectFourHumanPlayer(m);
