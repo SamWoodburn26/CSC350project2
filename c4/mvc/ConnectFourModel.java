@@ -5,7 +5,7 @@ import c4.IllegalMoveException;
 
 public class ConnectFourModel implements ConnectFourModelInterface{
 
-	int[][] grid;
+	public int[][] grid;
 	int turn;
 	
 	ArrayList<GridObserver> observers = new ArrayList<GridObserver>();
@@ -23,11 +23,6 @@ public class ConnectFourModel implements ConnectFourModelInterface{
 		turn = PLAYER1;
 		notifyGridObservers();
 	}
-
-	// @Override
-	// public void setGrid(int[][] grid){
-	// 	this.grid = grid;
-	// }
 	
 	@Override
 	public int setGridPosition(int column, int player) {

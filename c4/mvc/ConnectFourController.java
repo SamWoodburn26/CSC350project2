@@ -42,7 +42,6 @@ public class ConnectFourController implements ResultObserver{
 	public void placeToken(int column){
 		int row = model.setGridPosition(column, model.getTurn());
 		model.nextPlayer();
-		System.out.println("new player");
 		if(row == 0)
 			view.disableColumn(column);
 	}
