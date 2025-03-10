@@ -87,10 +87,13 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
         }
         //using helper method, make a deep copy of state
         int[][] newState = deepCopy(state);
+
+        /* print valid moves in actions for debugging */
         // System.out.print("Valid moves after move in col " + col + ": ");
         // for(int a: actions(newState)){
         //     System.out.print(a + ", ");
         // }
+
         //get the turn from the given state
         int player = getTurn(state);
         //use the players turn to set the correct token in the previously determined (row, col)
@@ -140,12 +143,66 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
         tempModel.initialize();
         tempModel.grid = deepCopy(state);
         int winner = tempModel.checkForWinner();
+        int aiPlayer = model.getTurn();
+    
+        // Terminal states
         if (winner >= 0) {
-            return (winner == model.getTurn()) ? 1000 : -1000; // Assumes AI is current player
+            return (winner == aiPlayer) ? 1000 : -1000;
         } else if (tempModel.checkForDraw()) {
             return 0;
         }
-        return 0; // Non-terminal state (for now)
+    
+        // Non-terminal evaluation
+        int score = 0;
+        int opponent = (aiPlayer == 1) ? 2 : 1;
+    
+        // Center control (columns 2, 3, 4 are more valuable)
+        int[] centerWeights = {0, 0, 1, 2, 1, 0, 0}; // Higher weight for central columns
+        for (int col = 0; col < 7; col++) {
+            for (int row = 0; row < 6; row++) {
+                if (state[col][row] == aiPlayer) { // Fix: col first, then row
+                    score += centerWeights[col];
+                } else if (state[col][row] == opponent) { // Fix: col first, then row
+                    score -= centerWeights[col];
+                }
+            }
+        }
+    
+        // Potential three-in-a-rows (simplified heuristic)
+        score += countPotentialThrees(state, aiPlayer) * 50;
+        score -= countPotentialThrees(state, opponent) * 50;
+    
+        return score;
+    }
+    
+    private int countPotentialThrees(int[][] state, int player) {
+        int count = 0;
+        // Horizontal
+        for (int row = 0; row < 6; row++) {
+            for (int col = 0; col < 4; col++) {
+                int playerCount = 0;
+                int emptyCount = 0;
+                for (int i = 0; i < 4; i++) {
+                    if (state[col + i][row] == player) playerCount++; // Fix: col first, then row
+                    else if (state[col + i][row] == -1) emptyCount++; // Fix: col first, then row
+                }
+                if (playerCount == 3 && emptyCount == 1) count++;
+            }
+        }
+        // Vertical
+        for (int col = 0; col < 7; col++) {
+            for (int row = 0; row < 3; row++) {
+                int playerCount = 0;
+                int emptyCount = 0;
+                for (int i = 0; i < 4; i++) {
+                    if (state[col][row + i] == player) playerCount++; // Fix: col first, then row
+                    else if (state[col][row + i] == -1) emptyCount++; // Fix: col first, then row
+                }
+                if (playerCount == 3 && emptyCount == 1) count++;
+            }
+        }
+        // Add diagonal checks if time permits (similar logic)
+        return count;
     }
 
 
