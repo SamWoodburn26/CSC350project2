@@ -125,7 +125,12 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
             }
         }
          //player 1 starts, so even moves = player 1’s turn
-        return (filled % 2 == 0) ? 1 : 2;
+         if (filled % 2 == 0) {
+            return 1;
+        } else {
+            return 2;
+        }
+        
     }
 
 
@@ -133,10 +138,60 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
     //QUESTION 7: UTILITY EXPLANATION
         /*
          * for this utility function we decide to use two factors to determine the best possible action.
-         * the first is CONTINUE TOMORROW
+         *  • the first is how good the column is:
+         *      - we assigned a weight value to each column (0-2)
+         *      - an int array was created to hold these weight values, so we could easily retrieve 
+         *        a columns weight based on its index
+         *      - the center columns were given higher values, while the outer columns had lower 
+         *        weight values
+         *      - therefore, the weight array looks like this: {0,0,1,2,1.0,0}
+         *      - reasoning: when placing a token in  the center, you have the possilibily of getting 
+         *        a four in a row in any of the 5 directions (vertical, hoirzontal moving left, 
+         *        horizontal moving right, positive diagnol, and negative diagnol). when placing a 
+         *        token in the outer columns, your options become more limited.  instead of being able 
+         *        to try for a four in a row in every direction, you can only try for 3 directions 
+         *        (vertical, hoirzontal moving left OR horizontal moving right (depending on which side 
+         *        of the board the token is placed), and positive diagnol OR negative diagnol (depending
+         *        on which side of the board the token is placed). therfore, when placing a token you 
+         *        are better off if it is in the center rather than closer to the edge because you have 
+         *        more opportunities to get a four in a row.
+         *  • the second is the possibility for there to be a three in a row in either the vertical or 
+         *    horizontal direction:
+         *      - used a seperate function to make the code cleaner
+         *      - have a count varibale (intialized to 0) to count the number of potential vertical and 
+         *        horizontal three in a rows
+         *      - for vertical checks: this function loops through each column and set of three rows, then
+         *        keeps track of the number of spaces occupied by the player (given by the parameter) and
+         *        and the number of empty spaces, if in that iteration of the loop there are 3 player
+         *        spaces and 1 empty space then increase count by one
+         *      - for horizontal checks: this function loops through each row and set of three columns, 
+         *        then keeps track of the number of spaces occupied by the player (given by the parameter)
+         *        and the number of empty spaces, if in that iteration of the loop there are 3 player
+         *        spaces and 1 empty space then increase count by one
+         *      - lastly, return the count variable
+         *      - reasoning: we wanted this to be the second condition checked in the utility function because
+         *        the goal of connect four is to get four in a row, so logically the best way to make your
+         *        decision on which move to make next would be to see where you'll have the best chance of
+         *        getting to that four in a row, and that would be any place where you can havethree in a row
+         *  • how it works: 
+         *      - first we made a variable to represent the 'goodness' of an action, which is initially
+         *        set to 0
+         *      - we create a copy the state in a new temporary connect four model in order to calculate
+         *        for the given state
+         *      - handle the terminal states of winning, losing, or a draw; we kept the previous values 
+         *        returning 1000 for win, -1000 for loss, and 0 for draw
+         *      - then handle the non-terminal states (every other position in game play that does not end
+         *        the game); this is where the goodness is used
+         *      - loop through each spot in the board, if it is occupied by the ai player then add the weight 
+         *        of that column to the goodness score, if it is occupied by the opponent then subtract the
+         *        weight of that column from the overall goodness score
+         *      - after that we calculated the potential threes for the ai player and add that * 50 to the
+         *        overall goodness and calculated the potential threes for the opponent and subtracted
+         *        that * 50 from the overall goodness 
+         *      - finally, after all calculations are done, return the goodness
          */
-    /* utility- determine the 'goodness' of each possible action for given state, returns int action */
-        /* for this we decided to have the center columns be better than the outer columns (because there are more options) */
+
+    /* utility- determine the 'goodness' of each possible action for given state, returns int goodness */
     public int utility(int[][] state) {
         //make a temporary model to hold a copy of the given state
         ConnectFourModel tempModel = new ConnectFourModel();
@@ -148,14 +203,25 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
     
         //terminal states (winner and draw)
         if (winner >= 0) {
-            return (winner == aiPlayer) ? 1000 : -1000;
+        if (winner == aiPlayer) {
+            return 1000;
+        } else {
+            return -1000;
+        }
         } else if (tempModel.checkForDraw()) {
             return 0;
         }
+
     
         //non-terminal evaluation (calculate goodness score)
         int goodness = 0;
-        int opponent = (aiPlayer == 1) ? 2 : 1;
+        int opponent;
+        if (aiPlayer == 1) {
+            opponent = 2;
+        } else {
+            opponent = 1;
+        }
+
         //more important centers (assign a weight to each column: columns 2, 3, 4 are more valuable)
         int[] centerWeights = {0, 0, 1, 2, 1, 0, 0}; 
         //loop through the board
@@ -218,7 +284,7 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
                 if (playerCount == 3 && emptyCount == 1) count++;
             }
         }
-        // Add diagonal checks if time permits (similar logic)
+        /* add diagonal checks for an even better ai player (did not have time to implement)*/
         //return count
         return count;
     }
